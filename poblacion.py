@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.15"
+__generated_with = "0.13.14"
 app = marimo.App(width="medium")
 
 
@@ -9,7 +9,7 @@ def _():
     from openpyxl import load_workbook
 
     try:
-        wb = load_workbook("repoblacev2011-2025-03_2.xlsx")
+        wb = load_workbook("data/repoblacev2011-2025-03_2.xlsx")
     except FileNotFoundError:
         print("Error: The file 'repoblacev2011-2025-03_2.xlsx' was not found.")
         print("Please upload the file and run the script again.")
@@ -47,6 +47,17 @@ def _():
 @app.cell
 def _(result_tuple):
     len(result_tuple)
+    return
+
+
+@app.cell
+def _(result_tuple):
+    import polars as pl
+
+    dataset_poblacion = pl.DataFrame(
+        data=result_tuple, schema=["distrito", "poblacion"], orient="row"
+    )
+    dataset_poblacion
     return
 
 
