@@ -1,7 +1,13 @@
 import marimo
 
-__generated_with = "0.13.11"
+__generated_with = "0.13.15"
 app = marimo.App(width="medium")
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""#<center>Construcción del Grafo Poblacional de Costa Rica a nivel Distrital</center>""")
+    return
 
 
 @app.cell
@@ -9,7 +15,11 @@ def _():
     import pandas as pd
     import geopandas as gpd
     import marimo as mo
-    return gpd, mo, pd
+    import networkx as nx
+    import matplotlib.pyplot as plt
+    import plotly.express as px
+    import altair as alt
+    return gpd, mo, nx, pd, plt, px
 
 
 @app.cell
@@ -69,6 +79,93 @@ def join_data(district_geospatial_data, district_population_data):
         columns={col: str(col).lower() for col in district_data.columns.to_list()}
     )
     district_data
+    return (district_data,)
+
+
+@app.cell
+def _(district_data, gpd):
+    geo_district_data = gpd.GeoDataFrame(district_data)
+    return (geo_district_data,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""## Grafo de contiguidad""")
+    return
+
+
+@app.cell
+def _(district_data, geo_district_data, nx):
+    # Crear grafo de contigüidad
+    G = nx.Graph()
+
+    # Agregar nodos con población
+    for idx, row in district_data.iterrows():
+        G.add_node(idx, nombre=row['distrito'], poblacion=row['poblacion_total'])
+
+    # Agregar aristas entre distritos contiguos
+    for i, geom in district_data.geometry.items():
+        vecinos = district_data[geo_district_data.geometry.touches(geom)].index
+        for v in vecinos:
+            if not G.has_edge(i, v):
+                G.add_edge(i, v)
+    return (G,)
+
+
+@app.cell
+def _(G, nx, plt):
+    # Visualizar el grafo de contigüidad (sin base geográfica)
+    plt.figure(figsize=(10, 10))
+    pos = nx.spring_layout(G, seed=42)
+    nx.draw(G, pos, node_size=10, with_labels=False)
+    plt.title('Grafo de contigüidad entre distritos')
+    plt.show()
+    return
+
+
+@app.cell
+def _():
+    ## TODO: VER ESTE GRAFO ENCIMA DEL MAPA DE CR
+    return
+
+
+@app.cell
+def _(geo_district_data, px):
+    def _():
+        geo_district_data_viz = geo_district_data.to_crs(epsg=4326)
+
+        # --- Interactive Visualization with Plotly Express ---
+
+        # The choropleth_mapbox function does all the heavy lifting.
+        fig = px.choropleth_mapbox(
+            geo_district_data_viz,
+            geojson=geo_district_data_viz.geometry,
+            locations=geo_district_data_viz.index,
+            color="poblacion_total",
+            hover_name="distrito",
+            hover_data={
+                "provincia": True,
+                "poblacion_total": ":,",
+                "area_km2": ":.2f"
+            },
+            mapbox_style="carto-positron",
+            center={"lat": 9.93, "lon": -84.08},
+            zoom=7,
+            opacity=0.7,
+            title="Población de Distritos de Costa Rica"
+        )
+
+        # Customize the layout for a cleaner look
+        fig.update_layout(
+            margin={"r":0, "t":40, "l":0, "b":0},
+            legend_title_text='Población'
+        )
+
+        # To show the figure in a notebook or script
+        return fig.show()
+
+
+    _()
     return
 
 
