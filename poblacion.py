@@ -26,6 +26,12 @@ def _():
 
 
 @app.cell
+def _():
+    organizer = HierarchyOrganizer()
+    return (organizer,)
+
+
+@app.cell
 def _(mo, organizer):
     organizer.new(level=1)
     mo.md(f"""## {organizer.format()}. **Cargado, limpieza y Exploración de los Datos**""")
@@ -33,13 +39,13 @@ def _(mo, organizer):
 
 
 @app.cell
-def open_data(gpd, pd):
+def open_data(gpd, mo, pd):
     district_population_data = pd.read_excel(
-        "https://github.com/Antonio-Tresol/datascience_lab_two_districts/raw/refs/heads/main/legacy_notebooks/data/df_distritos.xlsx"
+        mo.notebook_dir() / "legacy_notebooks/data/df_distritos.xlsx"
     )
     district_population_data["Codigo"] = district_population_data["Codigo"].astype("str")
 
-    shapefile_path = "https://github.com/Antonio-Tresol/datascience_lab_two_districts/raw/refs/heads/main/legacy_notebooks/data/UGED_MGN_2022/UGED_MGN_2022.shp"
+    shapefile_path = mo.notebook_dir() / "legacy_notebooks/data/UGED_MGN_2022/UGED_MGN_2022.shp"
 
     district_geospatial_data = gpd.read_file(shapefile_path)
 
@@ -424,91 +430,86 @@ def define_plotting_functions(go, gpd, nx, px):
     return build_continuity_graph, make_graph_map, make_interactive_map
 
 
-@app.cell(hide_code=True)
-def utils():
-    class HierarchyOrganizer:
+@app.class_definition(hide_code=True)
+class HierarchyOrganizer:
+    """
+    A class to manage and track numbering for a hierarchy of any depth.
+
+    This organizer can handle numbering schemes like "1", "1.1", "1.1.1", etc.,
+    making it useful for complex documents, outlines, or task lists.
+    """
+
+    def __init__(self, depth: int = 3):
         """
-        A class to manage and track numbering for a hierarchy of any depth.
+        Initializes the organizer for a given hierarchy depth.
 
-        This organizer can handle numbering schemes like "1", "1.1", "1.1.1", etc.,
-        making it useful for complex documents, outlines, or task lists.
+        Args:
+            depth (int, optional): The number of levels in the hierarchy.
+                                   Defaults to 3.
         """
+        if not isinstance(depth, int) or depth < 1:
+            raise ValueError("Depth must be a positive integer.")
+        self._depth = depth
+        self._state = [0] * self._depth
 
-        def __init__(self, depth: int = 3):
-            """
-            Initializes the organizer for a given hierarchy depth.
+    def new(self, level: int) -> list[int]:
+        """
+        Starts a new item at the specified level, resetting all lower levels.
 
-            Args:
-                depth (int, optional): The number of levels in the hierarchy.
-                                       Defaults to 3.
-            """
-            if not isinstance(depth, int) or depth < 1:
-                raise ValueError("Depth must be a positive integer.")
-            self._depth = depth
-            self._state = [0] * self._depth
+        For example, calling new(1) for Section will create a new Section 1,
+        and calling new(2) for Subsection will create a new Subsection 1.1.
 
-        def new(self, level: int) -> list[int]:
-            """
-            Starts a new item at the specified level, resetting all lower levels.
+        Args:
+            level (int): The 1-based level to increment (e.g., 1 for section,
+                         2 for subsection).
 
-            For example, calling new(1) for Section will create a new Section 1,
-            and calling new(2) for Subsection will create a new Subsection 1.1.
+        Returns:
+            list[int]: The new state of the hierarchy as a list of numbers.
+        """
+        if not (1 <= level <= self._depth):
+            raise IndexError(f"Level must be between 1 and {self._depth}.")
 
-            Args:
-                level (int): The 1-based level to increment (e.g., 1 for section,
-                             2 for subsection).
+        level_index = level - 1  # Convert to 0-based index
 
-            Returns:
-                list[int]: The new state of the hierarchy as a list of numbers.
-            """
-            if not (1 <= level <= self._depth):
-                raise IndexError(f"Level must be between 1 and {self._depth}.")
+        # Increment the specified level
+        self._state[level_index] += 1
 
-            level_index = level - 1  # Convert to 0-based index
+        # Reset all subsequent (lower) levels to zero
+        for i in range(level_index + 1, self._depth):
+            self._state[i] = 0
 
-            # Increment the specified level
-            self._state[level_index] += 1
+        return self.state
 
-            # Reset all subsequent (lower) levels to zero
-            for i in range(level_index + 1, self._depth):
-                self._state[i] = 0
+    @property
+    def state(self) -> list[int]:
+        """Returns the current hierarchy state as a list of numbers."""
+        return list(self._state)
 
-            return self.state
+    def format(self) -> str:
+        """
+        Formats the current state into a dot-separated string like "1.2.1".
 
-        @property
-        def state(self) -> list[int]:
-            """Returns the current hierarchy state as a list of numbers."""
-            return list(self._state)
+        Trailing zeros are omitted for a clean, standard representation.
+        For example, a state of [2, 1, 0] is formatted as "2.1".
+        """
+        # Find the last level that is not zero
+        last_significant_index = -1
+        for i in range(self._depth - 1, -1, -1):
+            if self._state[i] != 0:
+                last_significant_index = i
+                break
 
-        def format(self) -> str:
-            """
-            Formats the current state into a dot-separated string like "1.2.1".
+        # If all levels are zero (initial state), return "0"
+        if last_significant_index == -1:
+            return "0"
 
-            Trailing zeros are omitted for a clean, standard representation.
-            For example, a state of [2, 1, 0] is formatted as "2.1".
-            """
-            # Find the last level that is not zero
-            last_significant_index = -1
-            for i in range(self._depth - 1, -1, -1):
-                if self._state[i] != 0:
-                    last_significant_index = i
-                    break
+        # Join the numbers up to the last significant level
+        active_levels = self._state[: last_significant_index + 1]
+        return ".".join(map(str, active_levels))
 
-            # If all levels are zero (initial state), return "0"
-            if last_significant_index == -1:
-                return "0"
-
-            # Join the numbers up to the last significant level
-            active_levels = self._state[: last_significant_index + 1]
-            return ".".join(map(str, active_levels))
-
-        def reset(self) -> None:
-            """Resets the organizer back to its initial state."""
-            self._state = [0] * self._depth
-
-
-    organizer = HierarchyOrganizer()
-    return (organizer,)
+    def reset(self) -> None:
+        """Resets the organizer back to its initial state."""
+        self._state = [0] * self._depth
 
 
 if __name__ == "__main__":
