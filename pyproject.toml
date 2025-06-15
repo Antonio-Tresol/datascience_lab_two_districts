@@ -12,3 +12,6 @@ dependencies = [
     "scikit-learn>=1.7.0",
     "shapely>=2.1.1",
 ]
+
+[tool.marimo.runtime]
+output_max_bytes = 10_000_000_000
