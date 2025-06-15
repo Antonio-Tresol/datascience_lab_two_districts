@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdb:MD_Metadata xmlns:mdb="http://standards.iso.org/iso/19115/-3/mdb/2.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:cat="http://standards.iso.org/iso/19115/-3/cat/1.0"
+                 xmlns:gfc="http://standards.iso.org/iso/19110/gfc/1.1"
+                 xmlns:cit="http://standards.iso.org/iso/19115/-3/cit/2.0"
+                 xmlns:gcx="http://standards.iso.org/iso/19115/-3/gcx/1.0"
+                 xmlns:gex="http://standards.iso.org/iso/19115/-3/gex/1.0"
+                 xmlns:lan="http://standards.iso.org/iso/19115/-3/lan/1.0"
+                 xmlns:srv="http://standards.iso.org/iso/19115/-3/srv/2.1"
+                 xmlns:mas="http://standards.iso.org/iso/19115/-3/mas/1.0"
+                 xmlns:mcc="http://standards.iso.org/iso/19115/-3/mcc/1.0"
+                 xmlns:mco="http://standards.iso.org/iso/19115/-3/mco/1.0"
+                 xmlns:mda="http://standards.iso.org/iso/19115/-3/mda/1.0"
+                 xmlns:mds="http://standards.iso.org/iso/19115/-3/mds/2.0"
+                 xmlns:mdt="http://standards.iso.org/iso/19115/-3/mdt/2.0"
+                 xmlns:mex="http://standards.iso.org/iso/19115/-3/mex/1.0"
+                 xmlns:mmi="http://standards.iso.org/iso/19115/-3/mmi/1.0"
+                 xmlns:mpc="http://standards.iso.org/iso/19115/-3/mpc/1.0"
+                 xmlns:mrc="http://standards.iso.org/iso/19115/-3/mrc/2.0"
+                 xmlns:mrd="http://standards.iso.org/iso/19115/-3/mrd/1.0"
+                 xmlns:mri="http://standards.iso.org/iso/19115/-3/mri/1.0"
+                 xmlns:mrl="http://standards.iso.org/iso/19115/-3/mrl/2.0"
+                 xmlns:mrs="http://standards.iso.org/iso/19115/-3/mrs/1.0"
+                 xmlns:msr="http://standards.iso.org/iso/19115/-3/msr/2.0"
+                 xmlns:mdq="http://standards.iso.org/iso/19157/-2/mdq/1.0"
+                 xmlns:mac="http://standards.iso.org/iso/19115/-3/mac/2.0"
+                 xmlns:gco="http://standards.iso.org/iso/19115/-3/gco/1.0"
+                 xmlns:gml="http://www.opengis.net/gml/3.2"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 xsi:schemaLocation="http://standards.iso.org/iso/19115/-3/mds/2.0 http://standards.iso.org/iso/19115/-3/mds/2.0/mds.xsd">
+  <mdb:metadataIdentifier>
+      <mcc:MD_Identifier>
+         <mcc:code>
+            <gco:CharacterString>CR_INEC_UGED_5K_VE_2022</gco:CharacterString>
+         </mcc:code>
+         <mcc:codeSpace>
+            <gco:CharacterString>urn:uuid</gco:CharacterString>
+         </mcc:codeSpace>
+      </mcc:MD_Identifier>
+  </mdb:metadataIdentifier>
+  <mdb:defaultLocale>
+      <lan:PT_Locale id="ES">
+         <lan:language>
+            <lan:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="spa"/>
+         </lan:language>
+         <lan:country>
+            <lan:CountryCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CountryCode"
+                             codeListValue="ISO 3166-2: CR"/>
+         </lan:country>
+         <lan:characterEncoding>
+            <lan:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_CharacterSetCode"
+                                     codeListValue="utf8"/>
+         </lan:characterEncoding>
+      </lan:PT_Locale>
+  </mdb:defaultLocale>
+  <mdb:metadataScope>
+      <mdb:MD_MetadataScope>
+         <mdb:resourceScope>
+            <mcc:MD_ScopeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_ScopeCode"
+                              codeListValue="metadata"/>
+         </mdb:resourceScope>
+         <mdb:name gco:nilReason="missing">
+            <gco:CharacterString/>
+         </mdb:name>
+      </mdb:MD_MetadataScope>
+  </mdb:metadataScope>
+  <mdb:contact>
+      <cit:CI_Responsibility>
+         <cit:role>
+            <cit:CI_RoleCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_RoleCode"
+                             codeListValue="pointOfContact"/>
+         </cit:role>
+         <cit:party>
+            <cit:CI_Organisation>
+               <cit:name>
+                  <gco:CharacterString>Instituto Nacional de Estadística y Censos</gco:CharacterString>
+               </cit:name>
+               <cit:contactInfo>
+                  <cit:CI_Contact>
+                     <cit:address>
+                        <cit:CI_Address>
+                           <cit:electronicMailAddress gco:nilReason="missing">
+                              <gco:CharacterString/>
+                           </cit:electronicMailAddress>
+                        </cit:CI_Address>
+                     </cit:address>
+                  </cit:CI_Contact>
+               </cit:contactInfo>
+               <cit:individual>
+                  <cit:CI_Individual>
+                     <cit:name>
+                        <gco:CharacterString>MSc. Luis Carlos Paniagua Carvajal</gco:CharacterString>
+                     </cit:name>
+                     <cit:contactInfo>
+                        <cit:CI_Contact>
+                           <cit:phone>
+                              <cit:CI_Telephone>
+                                 <cit:number>
+                                    <gco:CharacterString>(506) 25271062</gco:CharacterString>
+                                 </cit:number>
+                                 <cit:numberType>
+                                    <cit:CI_TelephoneTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_TelephoneTypeCode"
+                                                              codeListValue="voice"/>
+                                 </cit:numberType>
+                              </cit:CI_Telephone>
+                           </cit:phone>
+                           <cit:phone>
+                              <cit:CI_Telephone>
+                                 <cit:number>
+                                    <gco:CharacterString>(506) 22242221</gco:CharacterString>
+                                 </cit:number>
+                                 <cit:numberType>
+                                    <cit:CI_TelephoneTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_TelephoneTypeCode"
+                                                              codeListValue="facsimilie"/>
+                                 </cit:numberType>
+                              </cit:CI_Telephone>
+                           </cit:phone>
+                           <cit:address>
+                              <cit:CI_Address>
+                                 <cit:deliveryPoint>
+                                    <gco:CharacterString>450 metros Oeste de la Rotonda de la Bandera. Edificio Ana Lorena</gco:CharacterString>
+                                 </cit:deliveryPoint>
+                                 <cit:city>
+                                    <gco:CharacterString>Mercedes de Montes de Oca</gco:CharacterString>
+                                 </cit:city>
+                                 <cit:administrativeArea>
+                                    <gco:CharacterString>San José</gco:CharacterString>
+                                 </cit:administrativeArea>
+                                 <cit:postalCode>
+                                    <gco:CharacterString>11503</gco:CharacterString>
+                                 </cit:postalCode>
+                                 <cit:country>
+                                    <gco:CharacterString>Costa Rica</gco:CharacterString>
+                                 </cit:country>
+                                 <cit:electronicMailAddress>
+                                    <gco:CharacterString>luis.paniagua@inec.go.cr</gco:CharacterString>
+                                 </cit:electronicMailAddress>
+                              </cit:CI_Address>
+                           </cit:address>
+                           <cit:hoursOfService>
+                              <gco:CharacterString>8:00 am - 4:00 pm</gco:CharacterString>
+                           </cit:hoursOfService>
+                        </cit:CI_Contact>
+                     </cit:contactInfo>
+                     <cit:positionName>
+                        <gco:CharacterString>luis.paniagua@inec.go.cr</gco:CharacterString>
+                     </cit:positionName>
+                  </cit:CI_Individual>
+               </cit:individual>
+            </cit:CI_Organisation>
+         </cit:party>
+      </cit:CI_Responsibility>
+  </mdb:contact>
+  <mdb:dateInfo>
+      <cit:CI_Date>
+         <cit:date>
+            <gco:Date>2022</gco:Date>
+         </cit:date>
+         <cit:dateType>
+            <cit:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode"
+                                 codeListValue="creation"/>
+         </cit:dateType>
+      </cit:CI_Date>
+  </mdb:dateInfo>
+  <mdb:dateInfo>
+      <cit:CI_Date>
+         <cit:date>
+            <gco:DateTime>2022-23-12T12:00:00</gco:DateTime>
+         </cit:date>
+         <cit:dateType>
+            <cit:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode"
+                                 codeListValue="revision"/>
+         </cit:dateType>
+      </cit:CI_Date>
+  </mdb:dateInfo>
+  <mdb:metadataStandard>
+      <cit:CI_Citation>
+         <cit:title>
+            <gco:CharacterString>ISO 19115-3:2018</gco:CharacterString>
+         </cit:title>
+         <cit:edition>
+            <gco:CharacterString>NTIG_CR04_10.2020. V.2</gco:CharacterString>
+         </cit:edition>
+      </cit:CI_Citation>
+  </mdb:metadataStandard>
+  <mdb:metadataLinkage>
+      <cit:CI_OnlineResource>
+         <cit:linkage>
+            <gco:CharacterString>https://meta2.snitcr.go.cr/geonetwork/srv/spa//metadata/3fdef8b9-dd7a-4828-a7aa-1483bf212234</gco:CharacterString>
+         </cit:linkage>
+         <cit:function>
+            <cit:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_OnLineFunctionCode"
+                                       codeListValue="completeMetadata"/>
+         </cit:function>
+      </cit:CI_OnlineResource>
+  </mdb:metadataLinkage>
+  <mdb:spatialRepresentationInfo>
+      <msr:MD_GridSpatialRepresentation>
+         <msr:numberOfDimensions>
+            <gco:Integer/>
+         </msr:numberOfDimensions>
+         <msr:cellGeometry>
+            <msr:MD_CellGeometryCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_CellGeometryCode"
+                                     codeListValue=""/>
+         </msr:cellGeometry>
+         <msr:transformationParameterAvailability>
+            <gco:Boolean/>
+         </msr:transformationParameterAvailability>
+      </msr:MD_GridSpatialRepresentation>
+  </mdb:spatialRepresentationInfo>
+  <mdb:spatialRepresentationInfo>
+      <msr:MD_VectorSpatialRepresentation>
+         <msr:topologyLevel>
+            <msr:MD_TopologyLevelCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_TopologyLevelCode"
+                                      codeListValue="surfaceGraph"/>
+         </msr:topologyLevel>
+         <msr:geometricObjects>
+            <msr:MD_GeometricObjects>
+               <msr:geometricObjectType>
+                  <msr:MD_GeometricObjectTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_GeometricObjectTypeCode"
+                                                  codeListValue="surface"/>
+               </msr:geometricObjectType>
+               <msr:geometricObjectCount>
+                  <gco:Integer>488</gco:Integer>
+               </msr:geometricObjectCount>
+            </msr:MD_GeometricObjects>
+         </msr:geometricObjects>
+      </msr:MD_VectorSpatialRepresentation>
+  </mdb:spatialRepresentationInfo>
+  <mdb:referenceSystemInfo>
+      <mrs:MD_ReferenceSystem>
+         <mrs:referenceSystemIdentifier>
+            <mcc:MD_Identifier>
+               <mcc:code>
+                  <gco:CharacterString>EPSG: 5367 / 8908</gco:CharacterString>
+               </mcc:code>
+            </mcc:MD_Identifier>
+         </mrs:referenceSystemIdentifier>
+         <mrs:referenceSystemType>
+            <mrs:MD_ReferenceSystemTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_ReferenceSystemTypeCode"
+                                            codeListValue="projected"/>
+         </mrs:referenceSystemType>
+      </mrs:MD_ReferenceSystem>
+  </mdb:referenceSystemInfo>
+  <mdb:identificationInfo>
+      <mri:MD_DataIdentification>
+         <mri:citation>
+            <cit:CI_Citation>
+               <cit:title>
+                  <gco:CharacterString>Unidades Geoestadísticas Distritales para el Marco Geoestadistico. Año 2022. Escala 1:5000</gco:CharacterString>
+               </cit:title>
+               <cit:alternateTitle>
+                  <gco:CharacterString>INEC_CR_UGED_5K_2022</gco:CharacterString>
+               </cit:alternateTitle>
+               <cit:date>
+                  <cit:CI_Date>
+                     <cit:date>
+                        <gco:Date>2022-23-12</gco:Date>
+                     </cit:date>
+                     <cit:dateType>
+                        <cit:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode"
+                                             codeListValue="creation"/>
+                     </cit:dateType>
+                  </cit:CI_Date>
+               </cit:date>
+               <cit:edition>
+                  <gco:CharacterString>Segunda Edición</gco:CharacterString>
+               </cit:edition>
+               <cit:editionDate>
+                  <gco:DateTime>2022</gco:DateTime>
+               </cit:editionDate>
+            </cit:CI_Citation>
+         </mri:citation>
+         <mri:abstract>
+            <gco:CharacterString>La Unidad Geoestadística Distrital (UGED) representa el territorio adscrito a un distrito tomando en consideración que sus límites estén guiados por elementos geográficos físicos claramente identificables en la realidad, o bien por otras características infraestructural o cultural, por lo tanto estas delimitaciones geoestadísticas evitan la tenencia de los límites imaginarios existentes en la División Territorial Administrativa (DTA) de Costa Rica. De este modo, el territorio del país se divide igualmente en 487 distritos pero con límites distintos a los de la DTA. El INEC ha elaborado esta capa geográfica a partir de fotointerpretación y según su metodología de actualización cartográfica utilizando como principal insumo las fotografías aéreas ortorectificadas a escala 1:5.000 del Registro Nacional del año 2015. Entonces la UGED es la cobertura vectorial poligonal que conforma los distritos y su respectivo límite de interconexión y que funciona como la principal figura de desagregación en el país para la divulgación y representación de datos geoestadísticos.
+Esta capa representa exclusivamente el territorio de un distrito del país y se generó a partir del trabajo en el campo y en oficina como parte del proceso de actualización del Marco Geoestadístico para el año 2022 en Costa Rica.</gco:CharacterString>
+         </mri:abstract>
+         <mri:purpose>
+            <gco:CharacterString>Brindar una cartografía base actualizada a nivel distrital país con el fin primordial de realizar las gestiones necesarias para la organización del operativo de empadronamiento censal y posteriormente para la representación cartográfica de información geoestadística asociada a cada distrito. Dicha información podrá ser utilizada para la gestión, planificación y toma de decisiones por parte de diversas autoridades del Estado costarricense así como de la sociedad en general por medio de investigaciones u otros ámbitos privados y académicos de relevancia.</gco:CharacterString>
+         </mri:purpose>
+         <mri:credit>
+            <gco:CharacterString>Esta información se origina a partir del trabajo de campo y de oficina ejecutado por personal técnico y profesional amparada en la metodología del INEC para la actualización cartográfica del Marco Geoestadístrico del año 2022.</gco:CharacterString>
+         </mri:credit>
+         <mri:status>
+            <mcc:MD_ProgressCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_ProgressCode"
+                                 codeListValue="completed"/>
+         </mri:status>
+         <mri:pointOfContact>
+            <cit:CI_Responsibility>
+               <cit:role>
+                  <cit:CI_RoleCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_RoleCode"
+                                   codeListValue="pointOfContact"/>
+               </cit:role>
+               <cit:party>
+                  <cit:CI_Organisation>
+                     <cit:name>
+                        <gco:CharacterString>Instituto Nacional de Estadística y Censos</gco:CharacterString>
+                     </cit:name>
+                     <cit:contactInfo>
+                        <cit:CI_Contact>
+                           <cit:address>
+                              <cit:CI_Address>
+                                 <cit:electronicMailAddress gco:nilReason="missing">
+                                    <gco:CharacterString/>
+                                 </cit:electronicMailAddress>
+                              </cit:CI_Address>
+                           </cit:address>
+                        </cit:CI_Contact>
+                     </cit:contactInfo>
+                     <cit:individual>
+                        <cit:CI_Individual>
+                           <cit:name>
+                              <gco:CharacterString>Licda. Pilar Ramos Vargas</gco:CharacterString>
+                           </cit:name>
+                           <cit:contactInfo>
+                              <cit:CI_Contact>
+                                 <cit:phone>
+                                    <cit:CI_Telephone>
+                                       <cit:number>
+                                          <gco:CharacterString>(506) 25271019</gco:CharacterString>
+                                       </cit:number>
+                                       <cit:numberType>
+                                          <cit:CI_TelephoneTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_TelephoneTypeCode"
+                                                                    codeListValue="voice"/>
+                                       </cit:numberType>
+                                    </cit:CI_Telephone>
+                                 </cit:phone>
+                                 <cit:phone>
+                                    <cit:CI_Telephone>
+                                       <cit:number>
+                                          <gco:CharacterString>(506) 22242221</gco:CharacterString>
+                                       </cit:number>
+                                       <cit:numberType>
+                                          <cit:CI_TelephoneTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_TelephoneTypeCode"
+                                                                    codeListValue="facsimilie"/>
+                                       </cit:numberType>
+                                    </cit:CI_Telephone>
+                                 </cit:phone>
+                                 <cit:address>
+                                    <cit:CI_Address>
+                                       <cit:deliveryPoint>
+                                          <gco:CharacterString>pilar.ramos@inec.go.cr</gco:CharacterString>
+                                       </cit:deliveryPoint>
+                                       <cit:city>
+                                          <gco:CharacterString>Mercedes de Montes de Oca</gco:CharacterString>
+                                       </cit:city>
+                                       <cit:administrativeArea>
+                                          <gco:CharacterString>San José</gco:CharacterString>
+                                       </cit:administrativeArea>
+                                       <cit:postalCode>
+                                          <gco:CharacterString>11503</gco:CharacterString>
+                                       </cit:postalCode>
+                                       <cit:country>
+                                          <gco:CharacterString>Costa Rica</gco:CharacterString>
+                                       </cit:country>
+                                       <cit:electronicMailAddress>
+                                          <gco:CharacterString>pilar.ramos@inec.go.cr</gco:CharacterString>
+                                       </cit:electronicMailAddress>
+                                    </cit:CI_Address>
+                                 </cit:address>
+                                 <cit:hoursOfService>
+                                    <gco:CharacterString>08:00 am - 04:00 pm</gco:CharacterString>
+                                 </cit:hoursOfService>
+                              </cit:CI_Contact>
+                           </cit:contactInfo>
+                           <cit:positionName>
+                              <gco:CharacterString>Coordinadora Área de Servicios de Información y Divulgación</gco:CharacterString>
+                           </cit:positionName>
+                        </cit:CI_Individual>
+                     </cit:individual>
+                  </cit:CI_Organisation>
+               </cit:party>
+            </cit:CI_Responsibility>
+         </mri:pointOfContact>
+         <mri:spatialRepresentationType>
+            <mcc:MD_SpatialRepresentationTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_SpatialRepresentationTypeCode"
+                                                  codeListValue="vector"/>
+         </mri:spatialRepresentationType>
+         <mri:spatialResolution>
+            <mri:MD_Resolution>
+               <mri:equivalentScale>
+                  <mri:MD_RepresentativeFraction>
+                     <mri:denominator>
+                        <gco:Integer>5000</gco:Integer>
+                     </mri:denominator>
+                  </mri:MD_RepresentativeFraction>
+               </mri:equivalentScale>
+            </mri:MD_Resolution>
+         </mri:spatialResolution>
+         <mri:topicCategory>
+            <mri:MD_TopicCategoryCode>imageryBaseMapsEarthCover</mri:MD_TopicCategoryCode>
+         </mri:topicCategory>
+         <mri:extent>
+            <gex:EX_Extent>
+               <gex:geographicElement>
+                  <gex:EX_GeographicBoundingBox>
+                     <gex:westBoundLongitude>
+                        <gco:Decimal>-86.20</gco:Decimal>
+                     </gex:westBoundLongitude>
+                     <gex:eastBoundLongitude>
+                        <gco:Decimal>-82.30</gco:Decimal>
+                     </gex:eastBoundLongitude>
+                     <gex:southBoundLatitude>
+                        <gco:Decimal>7.70</gco:Decimal>
+                     </gex:southBoundLatitude>
+                     <gex:northBoundLatitude>
+                        <gco:Decimal>11.50</gco:Decimal>
+                     </gex:northBoundLatitude>
+                  </gex:EX_GeographicBoundingBox>
+               </gex:geographicElement>
+               <gex:temporalElement>
+                  <gex:EX_TemporalExtent>
+                     <gex:extent>
+                        <gml:TimePeriod gml:id="A1234">
+                           <gml:beginPosition/>
+                           <gml:endPosition/>
+                        </gml:TimePeriod>
+                     </gex:extent>
+                  </gex:EX_TemporalExtent>
+               </gex:temporalElement>
+            </gex:EX_Extent>
+         </mri:extent>
+         <mri:extent>
+            <gex:EX_Extent>
+               <gex:geographicElement/>
+            </gex:EX_Extent>
+         </mri:extent>
+         <mri:extent>
+            <gex:EX_Extent>
+               <gex:verticalElement>
+                  <gex:EX_VerticalExtent>
+                     <gex:minimumValue>
+                        <gco:Real/>
+                     </gex:minimumValue>
+                     <gex:maximumValue>
+                        <gco:Real/>
+                     </gex:maximumValue>
+                     <gex:verticalCRS/>
+                  </gex:EX_VerticalExtent>
+               </gex:verticalElement>
+            </gex:EX_Extent>
+         </mri:extent>
+         <mri:resourceMaintenance>
+            <mmi:MD_MaintenanceInformation>
+               <mmi:maintenanceAndUpdateFrequency>
+                  <mmi:MD_MaintenanceFrequencyCode codeListValue="annually"
+                                                   codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_MaintenanceFrequencyCode"/>
+               </mmi:maintenanceAndUpdateFrequency>
+               <mmi:maintenanceDate>
+                  <cit:CI_Date>
+                     <cit:date>
+                        <gco:Date>2023-12</gco:Date>
+                     </cit:date>
+                     <cit:dateType>
+                        <cit:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode"
+                                             codeListValue="nextUpdate"/>
+                     </cit:dateType>
+                  </cit:CI_Date>
+               </mmi:maintenanceDate>
+            </mmi:MD_MaintenanceInformation>
+         </mri:resourceMaintenance>
+         <mri:graphicOverview>
+            <mcc:MD_BrowseGraphic>
+               <mcc:fileName>
+                  <gco:CharacterString>http://localhost:8080/geonetwork/srv/api/records/CR_INEC_UGED_5K_VE/attachments/UGED.PNG</gco:CharacterString>
+               </mcc:fileName>
+               <mcc:fileDescription>
+                  <gco:CharacterString>Unidades Geoestadísticas Distritales de Costa Rica</gco:CharacterString>
+               </mcc:fileDescription>
+            </mcc:MD_BrowseGraphic>
+         </mri:graphicOverview>
+         <mri:descriptiveKeywords>
+            <mri:MD_Keywords>
+               <mri:keyword>
+                  <gco:CharacterString>Censo</gco:CharacterString>
+               </mri:keyword>
+               <mri:keyword>
+                  <gco:CharacterString>Cartografía</gco:CharacterString>
+               </mri:keyword>
+               <mri:keyword>
+                  <gco:CharacterString>Unidad Geoestadística</gco:CharacterString>
+               </mri:keyword>
+               <mri:keyword>
+                  <gco:CharacterString>Límites</gco:CharacterString>
+               </mri:keyword>
+               <mri:type>
+                  <mri:MD_KeywordTypeCode codeListValue="theme"
+                                          codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_KeywordTypeCode"/>
+               </mri:type>
+            </mri:MD_Keywords>
+         </mri:descriptiveKeywords>
+         <mri:descriptiveKeywords>
+            <mri:MD_Keywords>
+               <mri:keyword>
+                  <gco:CharacterString>Costa Rica</gco:CharacterString>
+               </mri:keyword>
+               <mri:keyword>
+                  <gco:CharacterString>Distritos</gco:CharacterString>
+               </mri:keyword>
+               <mri:type>
+                  <mri:MD_KeywordTypeCode codeListValue="place"
+                                          codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_KeywordTypeCode"/>
+               </mri:type>
+            </mri:MD_Keywords>
+         </mri:descriptiveKeywords>
+         <mri:resourceConstraints>
+            <mco:MD_LegalConstraints>
+               <mco:accessConstraints>
+                  <mco:MD_RestrictionCode codeListValue="restricted"
+                                          codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_RestrictionCode"/>
+               </mco:accessConstraints>
+               <mco:useConstraints>
+                  <mco:MD_RestrictionCode codeListValue="restricted"
+                                          codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_RestrictionCode"/>
+               </mco:useConstraints>
+               <mco:otherConstraints>
+                  <gco:CharacterString>En caso de utilización o consulta de los datos debe mencionar el origen y propiedad de estos sin ninguna excepción.</gco:CharacterString>
+               </mco:otherConstraints>
+            </mco:MD_LegalConstraints>
+         </mri:resourceConstraints>
+         <mri:defaultLocale>
+            <lan:PT_Locale>
+               <lan:language>
+                  <lan:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="spa"/>
+               </lan:language>
+               <lan:country>
+                  <lan:CountryCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CountryCode"
+                                   codeListValue="ISO 3166-2: CR"/>
+               </lan:country>
+               <lan:characterEncoding>
+                  <lan:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_CharacterSetCode"
+                                           codeListValue="utf8"/>
+               </lan:characterEncoding>
+            </lan:PT_Locale>
+         </mri:defaultLocale>
+         <mri:supplementalInformation>
+            <gco:CharacterString>NA</gco:CharacterString>
+         </mri:supplementalInformation>
+      </mri:MD_DataIdentification>
+  </mdb:identificationInfo>
+  <mdb:contentInfo>
+      <mrc:MD_FeatureCatalogue>
+         <mrc:featureCatalogue>
+            <gfc:FC_FeatureCatalogue>
+               <gfc:producer/>
+               <gfc:featureType>
+                  <gfc:FC_FeatureType>
+                     <gfc:typeName/>
+                     <gfc:isAbstract>
+                        <gco:Boolean>false</gco:Boolean>
+                     </gfc:isAbstract>
+                     <gfc:carrierOfCharacteristics>
+                        <gfc:FC_FeatureAttribute>
+                           <gfc:memberName/>
+                           <gfc:definition gco:nilReason="missing">
+                              <gco:CharacterString/>
+                           </gfc:definition>
+                           <gfc:cardinality/>
+                        </gfc:FC_FeatureAttribute>
+                     </gfc:carrierOfCharacteristics>
+                     <gfc:featureCatalogue/>
+                  </gfc:FC_FeatureType>
+               </gfc:featureType>
+            </gfc:FC_FeatureCatalogue>
+         </mrc:featureCatalogue>
+      </mrc:MD_FeatureCatalogue>
+  </mdb:contentInfo>
+  <mdb:distributionInfo>
+      <mrd:MD_Distribution>
+         <mrd:distributionFormat/>
+      </mrd:MD_Distribution>
+  </mdb:distributionInfo>
+  <mdb:dataQualityInfo>
+      <mdq:DQ_DataQuality>
+         <mdq:scope>
+            <mcc:MD_Scope>
+               <mcc:level>
+                  <mcc:MD_ScopeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_ScopeCode"
+                                    codeListValue="dataset"/>
+               </mcc:level>
+            </mcc:MD_Scope>
+         </mdq:scope>
+      </mdq:DQ_DataQuality>
+  </mdb:dataQualityInfo>
+  <mdb:resourceLineage>
+      <mrl:LI_Lineage>
+         <mrl:statement>
+            <gco:CharacterString>Las UGED se digitalizaron originalmente como parte de la construcción de la cartografía digital del Censo de Población y Vivienda del año 2011, tomando como insumo principal la fotointerpretación de las fotografías aéreas ortorectificadas a escala 1:5.000 del Programa de Regularización de Catastro y Registro (PRCR) del año 2005 y el levantamiento de datos por medio de GPS. En esta segunda versión para los distritos se ha realizado una actualización cartográfica en el campo y en la oficina (por medio de las fotografías aéreas ortorectificadas a escala 1:5.000 del Registro Nacional del año 2015) siguiendo con los lineamientos metodológicos del INEC enfocados en el mejoramiento de la cartografía para el empadronamiento del Censo de Población y Vivienda del año 2022 en Costa Rica.
+Con respecto a la base de datos de estos vectores, se entienden de la siguiente manera:						
+ID: Es un consecutivo numérico para cada uno de los registros espaciales.	
+NOMB_UGED: Nombre del distrito geoestadístico.
+COD_UGED: Código del distrito geoestadístico.
+AREA_M2: Superficie en metros cuadrados de cada polígono del distrito geoestadístico.</gco:CharacterString>
+         </mrl:statement>
+         <mrl:scope>
+            <mcc:MD_Scope>
+               <mcc:level>
+                  <mcc:MD_ScopeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_ScopeCode"
+                                    codeListValue="dataset"/>
+               </mcc:level>
+            </mcc:MD_Scope>
+         </mrl:scope>
+      </mrl:LI_Lineage>
+  </mdb:resourceLineage>
+  <mdb:metadataMaintenance>
+      <mmi:MD_MaintenanceInformation>
+         <mmi:maintenanceAndUpdateFrequency>
+            <mmi:MD_MaintenanceFrequencyCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_MaintenanceFrequencyCode"
+                                             codeListValue="annually"/>
+         </mmi:maintenanceAndUpdateFrequency>
+      </mmi:MD_MaintenanceInformation>
+  </mdb:metadataMaintenance>
+</mdb:MD_Metadata>
