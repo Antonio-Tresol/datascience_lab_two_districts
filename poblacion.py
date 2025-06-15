@@ -6,7 +6,9 @@ app = marimo.App(width="medium")
 
 @app.cell
 def _(mo):
-    mo.md(r"""#<center>Construcción del Grafo Poblacional de Costa Rica a nivel Distrital</center>""")
+    mo.md(
+        r"""#<center>Construcción del Grafo Poblacional de Costa Rica a nivel Distrital</center>"""
+    )
     return
 
 
@@ -21,7 +23,9 @@ def _():
     import openpyxl
     import pyarrow
     import plotly.graph_objects as go
-    return go, gpd, mo, nx, pd, px
+    import numpy as np
+
+    return go, gpd, mo, np, nx, pd, px
 
 
 @app.cell
@@ -29,9 +33,13 @@ def open_data(gpd, mo, pd):
     district_population_data = pd.read_excel(
         mo.notebook_dir() / "legacy_notebooks/data/df_distritos.xlsx"
     )
-    district_population_data["Codigo"] = district_population_data["Codigo"].astype("str")
+    district_population_data["Codigo"] = district_population_data["Codigo"].astype(
+        "str"
+    )
 
-    shapefile_path = mo.notebook_dir() / "legacy_notebooks/data/UGED_MGN_2022/UGED_MGN_2022.shp"
+    shapefile_path = (
+        mo.notebook_dir() / "legacy_notebooks/data/UGED_MGN_2022/UGED_MGN_2022.shp"
+    )
 
     district_geospatial_data = gpd.read_file(shapefile_path)
 
@@ -91,6 +99,22 @@ def make_geodataframe(district_data, gpd):
 
 
 @app.cell
+def _(geo_district_data, gpd, np):
+    def polsby_popper(geom: gpd.GeoDataFrame) -> float:
+        if geom and geom.area > 0 and geom.length > 0:
+            return (4 * np.pi * geom.area) / (geom.length**2)
+        return 0
+
+    geo_district_data["polsby_popper"] = geo_district_data.geometry.apply(polsby_popper)
+    geo_district_data[["distrito", "polsby_popper"]].sort_values(
+        by="polsby_popper", ascending=True
+    )
+
+    geo_district_data.drop(columns="geometry")
+    return
+
+
+@app.cell
 def _(mo):
     mo.md(r"""## Grafo de contiguidad""")
     return
@@ -111,7 +135,25 @@ def make_neighbor_graph(district_data, geo_district_data, nx):
         for v in vecinos:
             if not G.has_edge(i, v):
                 G.add_edge(i, v)
+
+    # Métricas del grafo
+    print(f"Número de nodos: {G.number_of_nodes()}")
+    print(f"Número de aristas: {G.number_of_edges()}")
+    grados = [d for _, d in G.degree()]
+    print(f"Grado medio: {sum(grados) / len(grados):.2f}")
+    print(f"Número de componentes conexas: {nx.number_connected_components(G)}")
     return (G,)
+
+
+@app.cell
+def _(G, nx):
+    componentes = list(nx.connected_components(G))
+    print(f"Número de componentes conexas: {len(componentes)}")
+    if len(componentes) == 1:
+        print("Todos los distritos están contiguamente conectados.")
+    else:
+        print("Advertencia: hay distritos desconectados.")
+    return
 
 
 @app.cell
@@ -210,7 +252,6 @@ def show_neighbor_graph(G, geo_district_data, go, px):
         # --- 6. Show the Final Interactive Visualization ---
         return fig.show()
 
-
     make_graph_map()
     return
 
@@ -254,8 +295,68 @@ def show_interactive_map(geo_district_data, px):
         # To show the figure in a notebook or script
         return fig.show()
 
-
     make_interactive_map()
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+    # Para evaluar
+    - Validar que el grafo de continuidad generado por el clustering mantenga los componenetes conexos preexistentes.
+    - Entre menos desviación porcentual de población haya entre los distritos nuevos (creados por el clustering, mejor esta funcionan el clustering)
+    - En polbsy poper cercano a uno es mejor
+    """
+    )
+    return
+
+
+@app.cell
+def _():
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.preprocessing import normalize
+    from sklearn.cluster import SpectralClustering
+    from sklearn.cluster import DBSCAN
+    from sklearn.cluster import KMeans
+
+    return (KMeans,)
+
+
+@app.cell
+def _(geo_district_data):
+    # Nuevo valor de k
+    poblacion_total = geo_district_data["poblacion_total"].sum()
+    meta_poblacional = 45000  # nueva cantidad
+    cantidad_diputados = poblacion_total / meta_poblacional
+
+    k = round(poblacion_total / meta_poblacional)
+    print(f"Número estimado de distritos (k): {k}")
+    return (k,)
+
+
+@app.cell
+def _(KMeans, geo_district_data, k, pd):
+    coordinates = pd.DataFrame(
+        data={
+            "x": geo_district_data.geometry.centroid.x,
+            "y": geo_district_data.geometry.centroid.y,
+        },
+    ).values
+    coordinates
+
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init=10).fit(coordinates)
+    new_geo_districts = geo_district_data.copy()
+
+    new_geo_districts["distrito_nuevo"] = kmeans.labels_
+    # TODO: hacer gráfico interactivo
+    new_geo_districts.plot(
+        column="distrito_nuevo",
+        categorical=True,
+        figsize=(20, 20),
+        legend=False,
+        edgecolor="k",
+    )
     return
 
 
