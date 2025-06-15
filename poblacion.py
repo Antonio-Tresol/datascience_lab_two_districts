@@ -40,14 +40,13 @@ def _(mo, organizer):
 
 @app.cell
 def open_data(gpd, mo, pd):
-    district_population_data = pd.read_excel(
-        mo.notebook_dir() / "legacy_notebooks/data/df_distritos.xlsx"
-    )
+    district_path = mo.notebook_dir() / "data" / "df_distritos.xlsx"
+    district_population_data = pd.read_excel(str(district_path))
     district_population_data["Codigo"] = district_population_data["Codigo"].astype("str")
 
-    shapefile_path = mo.notebook_dir() / "legacy_notebooks/data/UGED_MGN_2022/UGED_MGN_2022.shp"
+    shapefile_path = mo.notebook_dir() / "data" / "UGED_MGN_2022" / "UGED_MGN_2022.shp"
 
-    district_geospatial_data = gpd.read_file(shapefile_path)
+    district_geospatial_data = gpd.read_file(str(shapefile_path))
 
     district_geospatial_data = district_geospatial_data[
         district_geospatial_data.geometry.notnull()
