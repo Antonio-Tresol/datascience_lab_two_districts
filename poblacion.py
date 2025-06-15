@@ -193,6 +193,12 @@ def _(mo, organizer):
     - Validar que el grafo de continuidad generado por el clustering mantenga los componenetes conexos preexistentes.
     - Entre menos desviación porcentual de población haya entre los distritos nuevos (creados por el clustering, mejor esta funcionan el clustering)
     - En polbsy poper cercano a uno es mejor
+    - No se pueden partir distritos. Solo unir
+    - Validar rangos 
+    - maximizar polbsy (con umbral, 35% peso) y reducir desviación de los nuevos distritos con respecto a población meta (65% peso) y que sea conexo (excepto las pequeñas islas) 
+    - medir polsby con los distritos clusterizados.
+    - ponerlos etiquetados cuando los mostramos en mapas.
+    - un distrito electoral escoge un diputado.
     """)
     return
 
@@ -211,7 +217,8 @@ def _():
 def _(geo_district_data):
     # Nuevo valor de k
     poblacion_total = geo_district_data["poblacion_total"].sum()
-    meta_poblacional = 45000  # nueva cantidad
+    meta_poblacional = 45000  # nueva cantidad (población país/cantidad de diputados)
+    # es la misma para todas las provincias
     cantidad_diputados = poblacion_total / meta_poblacional
 
     k = round(poblacion_total / meta_poblacional)
