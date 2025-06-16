@@ -199,6 +199,8 @@ def _(mo, organizer):
     - medir polsby con los distritos clusterizados.
     - ponerlos etiquetados cuando los mostramos en mapas.
     - un distrito electoral escoge un diputado.
+    - hacer el analisis con 57, con 84, con 160 diputados (esto influye en la poblacion meta. recordar poblacion meta es poblacion_cr/num_diputados)
+    - region growing
     """)
     return
 
@@ -520,6 +522,3 @@ class HierarchyOrganizer:
 
 if __name__ == "__main__":
     app.run()
-
-
-
