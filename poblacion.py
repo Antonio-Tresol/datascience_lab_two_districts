@@ -14,11 +14,11 @@ def _(mo):
 def _():
     import pandas as pd
     import geopandas as gpd
-    import marimo as mo
     import networkx as nx
     import matplotlib.pyplot as plt
     import plotly.express as px
     import openpyxl
+    import marimo as mo
     import pyarrow
     import plotly.graph_objects as go
     import numpy as np
@@ -27,7 +27,7 @@ def _():
 
 @app.cell
 def _():
-    organizer = HierarchyOrganizer()
+    organizer = HierarchyOrganizer(depth=4)
     return (organizer,)
 
 
@@ -65,7 +65,6 @@ def join_data(district_geospatial_data, district_population_data):
     district_data = district_data.drop(
         columns=[
             "COD_UGED",
-            "NOMB_UGEC",
             "NOMB_UGED",
             "ID",
         ]
@@ -73,6 +72,7 @@ def join_data(district_geospatial_data, district_population_data):
     district_data = district_data.rename(
         columns={
             "NOMB_UGEP": "provincia",
+            "NOMB_UGEC": "canton",
             "Total": "poblacion_total",
         }
     )
@@ -177,6 +177,109 @@ def plot_map(geo_district_data, make_interactive_map):
 
 
 @app.cell
+def _(mo):
+    mo.md(f"""**Provincias**""")
+    return
+
+
+@app.cell
+def _(px):
+    unique_colors = px.colors.qualitative.Dark24 + px.colors.qualitative.Light24 + px.colors.qualitative.Pastel1 + px.colors.qualitative.Pastel2
+    return (unique_colors,)
+
+
+@app.cell
+def province_dropdown(mo):
+    province_dropdown = mo.ui.dropdown(
+        options={
+            "San José": "SAN JOSE",
+            "Alajuela": "ALAJUELA",
+            "Cartago": "CARTAGO",
+            "Heredia": "HEREDIA",
+            "Guanacaste": "GUANACASTE",
+            "Puntarenas": "PUNTARENAS",
+            "Limón": "LIMON",
+        },
+        value="San José",
+        label="Provincia"
+    )
+    return (province_dropdown,)
+
+
+@app.cell
+def color_dropdown(mo):
+    column_color_dropdown = mo.ui.dropdown(
+        options={
+            "Población total": "poblacion_total",
+            "Área (km²)": "area_km2",
+            "Cantón": "canton"
+        },
+        value="Población total",
+        label="Variable para color"
+    )
+    return (column_color_dropdown,)
+
+
+@app.cell
+def filtered_data(geo_district_data, province_dropdown):
+    selected_province = province_dropdown.value
+    selected_province_key = province_dropdown.selected_key
+    selected_province_geo_district_data = geo_district_data[geo_district_data["provincia"] == selected_province]
+    return selected_province_geo_district_data, selected_province_key
+
+
+@app.cell
+def _(column_color_dropdown):
+    selected_column_color = column_color_dropdown.value
+    selected_column_color_key = column_color_dropdown.selected_key
+    return selected_column_color, selected_column_color_key
+
+
+@app.cell
+def _(selected_column_color, unique_colors):
+    plot_colors = None
+    if selected_column_color != "poblacion_total" or selected_column_color != "area_km2":
+        plot_colors = unique_colors
+    return (plot_colors,)
+
+
+@app.cell
+def make_figure(
+    make_interactive_map,
+    mo,
+    plot_colors,
+    selected_column_color,
+    selected_column_color_key,
+    selected_province_geo_district_data,
+    selected_province_key,
+):
+    interactive_map = mo.ui.plotly(make_interactive_map(
+        geo_df=selected_province_geo_district_data,
+        title=f"Distritos de {selected_province_key} mostrados por {selected_column_color_key}",
+        color_col=selected_column_color,
+        legend_title=selected_column_color_key,
+        return_figure=True,
+        color_sequence=plot_colors
+    ))
+    return (interactive_map,)
+
+
+@app.cell
+def display_map(column_color_dropdown, interactive_map, mo, province_dropdown):
+    mo.vstack([
+        province_dropdown,
+        column_color_dropdown,
+        interactive_map
+    ])
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
 def _(mo, organizer):
     organizer.new(level=1)
     mo.md(
@@ -252,6 +355,11 @@ def _(KMeans, geo_district_data, k, make_interactive_map, pd):
 
 
 @app.cell
+def _():
+    return
+
+
+@app.cell
 def _(mo, organizer):
     organizer.new(level=1)
     mo.md(f"""## {organizer.format()}. Anexo""")
@@ -295,6 +403,7 @@ def define_plotting_functions(go, gpd, nx, px):
         geo_district_data: gpd.GeoDataFrame,
         title: str,
         color_col: str = "poblacion_total",
+        legend_title: str = "Población"
     ) -> None:
         """Create an interactive map showing the contiguity graph"""
 
@@ -322,7 +431,7 @@ def define_plotting_functions(go, gpd, nx, px):
             fig.update_layout(
                 map_style="carto-positron",
                 margin={"r": 0, "t": 40, "l": 0, "b": 0},
-                legend_title_text="Población",
+                legend_title_text=legend_title,
             )
             return fig
 
@@ -396,6 +505,9 @@ def define_plotting_functions(go, gpd, nx, px):
         geo_df: gpd.GeoDataFrame,
         title: str,
         color_col: str,
+        legend_title: str = "Población",
+        color_sequence: list = None,
+        return_figure: bool = False,
         extra_hover_data: dict = {},
     ) -> None:
         """Create an interactive choropleth map"""
@@ -411,6 +523,7 @@ def define_plotting_functions(go, gpd, nx, px):
             geojson=geo_district_data_viz.geometry,
             locations=geo_district_data_viz.index,
             color=color_col,
+            color_discrete_sequence=color_sequence,
             hover_name="distrito",
             hover_data=hover_data,
             center={
@@ -430,11 +543,16 @@ def define_plotting_functions(go, gpd, nx, px):
                 "l": 0,
                 "b": 0,
             },
-            legend_title_text="Población",
+            legend_title_text=legend_title,
         )
 
+        if return_figure:
+            return fig
+    
         # To show the figure in a notebook or script
         fig.show()
+
+
     return build_continuity_graph, make_graph_map, make_interactive_map
 
 
