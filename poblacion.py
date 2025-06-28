@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.15"
+__generated_with = "0.14.8"
 app = marimo.App(width="medium")
 
 
@@ -225,7 +225,11 @@ def filtered_data(geo_district_data, province_dropdown):
     selected_province = province_dropdown.value
     selected_province_key = province_dropdown.selected_key
     selected_province_geo_district_data = geo_district_data[geo_district_data["provincia"] == selected_province]
-    return selected_province_geo_district_data, selected_province_key
+    return (
+        selected_province,
+        selected_province_geo_district_data,
+        selected_province_key,
+    )
 
 
 @app.cell
@@ -275,11 +279,6 @@ def display_map(column_color_dropdown, interactive_map, mo, province_dropdown):
 
 
 @app.cell
-def _():
-    return
-
-
-@app.cell
 def _(mo, organizer):
     organizer.new(level=1)
     mo.md(
@@ -315,7 +314,9 @@ def _():
     from sklearn.cluster import SpectralClustering
     from sklearn.cluster import DBSCAN
     from sklearn.cluster import KMeans
-    return (KMeans,)
+    from sklearn.cluster import Birch
+    from sklearn.cluster import OPTICS
+    return Birch, KMeans
 
 
 @app.cell
@@ -328,7 +329,7 @@ def _(geo_district_data):
 
     k = round(poblacion_total / meta_poblacional)
     print(f"Número estimado de distritos (k): {k}")
-    return (k,)
+    return k, poblacion_total
 
 
 @app.cell
@@ -355,7 +356,216 @@ def _(KMeans, geo_district_data, k, make_interactive_map, pd):
 
 
 @app.cell
-def _():
+def _(mo, organizer):
+    organizer.new(level=2)
+    mo.md(f"""## {organizer.format()}. Birch""")
+    return
+
+
+@app.cell
+def _(poblacion_total):
+    # 1 diputación por distrito, 59, 80, 150
+    diputados = 59
+    poblacion_meta = poblacion_total / diputados
+    K = round(diputados/7) # como definir diputaciones por provincia
+    provincias = ["SAN JOSE","ALAJUELA","CARTAGO","HEREDIA","GUANACASTE","PUNTARENAS","LIMON"]
+    return K, poblacion_meta, provincias
+
+
+@app.cell
+def _(Birch, K, geo_district_data, pd, provincias):
+
+    nuevos_distritos = []
+
+    for provincia in provincias:
+        geo_district_birch = geo_district_data[geo_district_data["provincia"] == provincia]
+
+        coordinates_birch = pd.DataFrame(
+            data={
+                "x": geo_district_birch.geometry.centroid.x,
+                "y": geo_district_birch.geometry.centroid.y,
+    #            "poblacion":geo_district_birch.poblacion_total,
+    #            "area":geo_district_birch.area_km2,
+            },
+        ).values
+
+        birch = Birch(threshold=0.5, branching_factor=50, n_clusters=K, compute_labels=True).fit(coordinates_birch)
+
+        new_geo_districts_birch = geo_district_birch.copy()
+
+        new_geo_districts_birch["distrito_nuevo"] = birch.labels_
+
+        nuevos_distritos.append(new_geo_districts_birch)
+
+    new_geo_districts_birch = pd.concat([nuevos_distritos[0], nuevos_distritos[1],nuevos_distritos[2], nuevos_distritos[3], nuevos_distritos[4], nuevos_distritos[5],nuevos_distritos[6]])
+
+    return (new_geo_districts_birch,)
+
+
+@app.cell
+def _(new_geo_districts_birch):
+    new_geo_districts_birch
+    return
+
+
+@app.cell
+def _(make_interactive_map, new_geo_districts_birch):
+    make_interactive_map(
+        new_geo_districts_birch,
+        "Distritos Creados por Birch",
+        "distrito_nuevo",
+        extra_hover_data={"distrito_nuevo": True},
+    )
+    return
+
+
+@app.cell
+def _(new_geo_districts_birch, selected_province):
+    selected_province_new_geo_districts_birch = new_geo_districts_birch[new_geo_districts_birch["provincia"] == selected_province]
+    selected_province_new_geo_districts_birch
+    return (selected_province_new_geo_districts_birch,)
+
+
+@app.cell
+def _(mo):
+    column_color_dropdown_birch = mo.ui.dropdown(
+        options={
+            "Población total": "poblacion_total",
+            "Área (km²)": "area_km2",
+            "Cantón": "canton",
+            "Distrito nuevo": "distrito_nuevo"
+        },
+        value="Distrito nuevo",
+        label="Variable para color"
+    )
+    return (column_color_dropdown_birch,)
+
+
+@app.cell
+def _(column_color_dropdown_birch):
+    selected_column_color_birch = column_color_dropdown_birch.value
+    selected_column_color_key_birch = column_color_dropdown_birch.selected_key
+    return selected_column_color_birch, selected_column_color_key_birch
+
+
+@app.cell
+def _(selected_column_color_birch, unique_colors):
+    plot_colors_birch = None
+    if selected_column_color_birch != "poblacion_total" or selected_column_color_birch != "area_km2":
+        plot_colors_birch = unique_colors
+    return
+
+
+@app.cell
+def _(
+    column_color_dropdown_birch,
+    make_interactive_map,
+    mo,
+    plot_colors,
+    province_dropdown,
+    selected_column_color_birch,
+    selected_column_color_key,
+    selected_column_color_key_birch,
+    selected_province_key,
+    selected_province_new_geo_districts_birch,
+):
+    #selected_province_new_geo_districts_birch = new_geo_districts_birch[new_geo_districts_birch["provincia"] == selected_province]
+
+    interactive_map_birch = mo.ui.plotly(make_interactive_map(
+        geo_df=selected_province_new_geo_districts_birch,
+        title=f"Distritos de {selected_province_key} mostrados por {selected_column_color_key}",
+        color_col=selected_column_color_birch,
+        legend_title=selected_column_color_key_birch,
+        return_figure=True,
+        color_sequence=plot_colors
+    ))
+
+    mo.vstack([
+        province_dropdown,
+        column_color_dropdown_birch,
+        interactive_map_birch
+    ])
+    return
+
+
+@app.cell
+def _(new_geo_districts_birch, poblacion_meta):
+
+    agrupado = new_geo_districts_birch.groupby(['provincia','distrito_nuevo']).agg(
+        poblacion = ('poblacion_total', 'sum'),
+        area = ('area_km2', 'sum')
+    )
+
+    agrupado['Desviacion_%'] = 100 * (agrupado['poblacion'] - poblacion_meta) / poblacion_meta
+    agrupado
+
+    #agrupado_al['Desviacion_%'] = 100 * (agrupado_al['Poblacion'] - meta_poblacional) / meta_poblacional
+    #agrupado_al.sort_values(by='Poblacion')
+    return (agrupado,)
+
+
+@app.cell
+def _(K, agrupado, meta_poblacional_eval):
+    agrupado.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
+    meta_poblacional_eval['meta_poblacional_provincia'] = meta_poblacional_eval['poblacion']/K
+    return
+
+
+@app.cell
+def _(K, agrupado):
+    meta_poblacional_eval = agrupado.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
+    meta_poblacional_eval['meta_poblacional_provincia'] = meta_poblacional_eval['poblacion']/K
+    meta_poblacional_eval['limite_inferior'] = 0.75 * meta_poblacional_eval['meta_poblacional_provincia']
+    meta_poblacional_eval['limite_superior'] = 1.25 * meta_poblacional_eval['meta_poblacional_provincia']
+    meta_poblacional_eval
+    return (meta_poblacional_eval,)
+
+
+@app.cell
+def _(agrupado, meta_poblacional_eval):
+    agrupado_vals = agrupado.merge(meta_poblacional_eval, on='provincia')
+    agrupado_vals
+    return (agrupado_vals,)
+
+
+@app.cell
+def _(agrupado_vals):
+
+    # Agregar columnas de validación
+    agrupado_vals['Valido'] = agrupado_vals['poblacion_x'].between(agrupado_vals['limite_inferior'], agrupado_vals['limite_superior'])
+
+    agrupado_vals
+
+    return
+
+
+@app.cell
+def _(agrupado_vals, polsby_popper):
+    agrupado_vals["polsby_popper"] = agrupado_vals.geometry.apply(polsby_popper)
+    agrupado_vals[["distrito_nuevo", "polsby_popper"]] = agrupado_vals[
+        ["distrito_nuevo", "polsby_popper"]
+    ].sort_values(by="polsby_popper", ascending=True)
+    agrupado_vals
+    return
+
+
+@app.cell
+def _(geo_district_data, mo, organizer):
+    """Calculate district metrics like Polsby-Popper compactness"""
+
+
+
+    organizer.new(level=3)
+    title_original_data_with_polsby_popper_birch = mo.md(
+        text=f"### {organizer.format()}. Distritos originales con polsby popper (sin la columna de geometría)"
+    )
+
+    mo.vstack(
+        items=[
+            title_original_data_with_polsby_popper_birch,
+            geo_district_data.drop(columns="geometry"),
+        ]
+    )
     return
 
 
@@ -548,7 +758,7 @@ def define_plotting_functions(go, gpd, nx, px):
 
         if return_figure:
             return fig
-    
+
         # To show the figure in a notebook or script
         fig.show()
 
