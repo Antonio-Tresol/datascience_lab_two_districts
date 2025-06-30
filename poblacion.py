@@ -540,12 +540,22 @@ def _(agrupado_vals):
 
 
 @app.cell
-def _(agrupado_vals, polsby_popper):
-    agrupado_vals["polsby_popper"] = agrupado_vals.geometry.apply(polsby_popper)
-    agrupado_vals[["distrito_nuevo", "polsby_popper"]] = agrupado_vals[
+def _(new_geo_districts_birch, polsby_popper):
+    new_geo_districts_birch_polspby_popper = new_geo_districts_birch.drop(columns = ['codigo', 'distrito', 'canton', 'polsby_popper'])
+    new_geo_districts_birch_polspby_popper = new_geo_districts_birch_polspby_popper.dissolve(by=['distrito_nuevo', 'provincia'], aggfunc='sum', as_index=False)
+    new_geo_districts_birch_polspby_popper["polsby_popper"] = new_geo_districts_birch_polspby_popper.geometry.apply(polsby_popper)
+    new_geo_districts_birch_polspby_popper.columns
+    return (new_geo_districts_birch_polspby_popper,)
+
+
+@app.cell
+def _(new_geo_districts_birch_polspby_popper, polsby_popper):
+    new_geo_districts_birch_polspby_popper["polsby_popper"] = new_geo_districts_birch_polspby_popper.geometry.apply(polsby_popper)
+    new_geo_districts_birch_polspby_popper[["distrito_nuevo", "polsby_popper"]] = new_geo_districts_birch_polspby_popper[
         ["distrito_nuevo", "polsby_popper"]
     ].sort_values(by="polsby_popper", ascending=True)
-    agrupado_vals
+    new_geo_districts_birch_polspby_popper.drop(columns='geometry', inplace=True)
+    new_geo_districts_birch_polspby_popper
     return
 
 
