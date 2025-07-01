@@ -124,7 +124,7 @@ def calculate_metrics(geo_district_data, mo, organizer, polsby_popper):
 @app.cell
 def _(mo, organizer):
     organizer.new(level=2)
-    mo.md(f"""### {organizer.format()} Grafo de contiguidad""")
+    mo.md(f"""### {organizer.format()} Grafo de contigüidad""")
     return
 
 
