@@ -720,7 +720,7 @@ def _(mo, organizer):
 
 
 @app.cell
-def _(k, np):
+def _():
     ALPHA = 0.1
     DECAY_FUNC = 'linear_decay_to_zero'
     SIGMA0 = 1
@@ -729,8 +729,8 @@ def _(k, np):
     DISTANCE_FUNC = 'euclidean'
     TOPOLOGY = 'rectangular'
     RANDOM_SEED = 123
-    SOM_X_AXIS_NODES  = round(np.sqrt(k))
-    SOM_Y_AXIS_NODES  = round(np.sqrt(k))
+    SOM_X_AXIS_NODES  = 4
+    SOM_Y_AXIS_NODES  = 2
     SOM_N_VARIABLES  = 2
     N_ITERATIONS = 5000
     return (
