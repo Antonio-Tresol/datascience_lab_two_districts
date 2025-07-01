@@ -321,9 +321,16 @@ def _():
 
 
 @app.cell
-def variables_for_modeling():
+def variables_for_modeling(geo_district_data):
     provincias = ["SAN JOSE","ALAJUELA","CARTAGO","HEREDIA","GUANACASTE","PUNTARENAS","LIMON"]
-    return (provincias,)
+
+    poblacion_total = geo_district_data["poblacion_total"].sum()
+    # 1 diputación por distrito, 59, 80, 150
+    diputados = 59
+    meta_poblacional = poblacion_total / diputados
+    k = round(diputados/7) # como definir diputaciones por provincia
+    print(f"Número estimado de distritos (k): {k}")
+    return k, meta_poblacional, provincias
 
 
 @app.cell
@@ -331,19 +338,6 @@ def _(mo, organizer):
     organizer.new(level=2)
     mo.md(f"""## {organizer.format()}. Kmeans""")
     return
-
-
-@app.cell
-def _(geo_district_data):
-    # Nuevo valor de k
-    poblacion_total = geo_district_data["poblacion_total"].sum()
-    meta_poblacional = 45000  # nueva cantidad (población país/cantidad de diputados)
-    # es la misma para todas las provincias
-    cantidad_diputados = poblacion_total / meta_poblacional
-
-    k = round(poblacion_total / meta_poblacional / 7)
-    print(f"Número estimado de distritos (k): {k}")
-    return k, poblacion_total
 
 
 @app.cell
@@ -447,22 +441,22 @@ def _(
 
 
 @app.cell
-def _(new_geo_districts_km, poblacion_meta):
+def _(meta_poblacional, new_geo_districts_km):
     agrupado_km = new_geo_districts_km.groupby(['provincia','distrito_nuevo']).agg(
         poblacion = ('poblacion_total', 'sum'),
         area = ('area_km2', 'sum')
     )
 
-    agrupado_km['Desviacion_%'] = 100 * (agrupado_km['poblacion'] - poblacion_meta) / poblacion_meta
+    agrupado_km['Desviacion_%'] = 100 * (agrupado_km['poblacion'] - meta_poblacional) / meta_poblacional
     agrupado_km.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
     agrupado_km
     return (agrupado_km,)
 
 
 @app.cell
-def _(K, agrupado_km):
+def _(agrupado_km, k):
     meta_poblacional_eval_km = agrupado_km.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
-    meta_poblacional_eval_km['meta_poblacional_provincia'] = meta_poblacional_eval_km['poblacion']/K
+    meta_poblacional_eval_km['meta_poblacional_provincia'] = meta_poblacional_eval_km['poblacion']/k
     meta_poblacional_eval_km['limite_inferior'] = 0.75 * meta_poblacional_eval_km['meta_poblacional_provincia']
     meta_poblacional_eval_km['limite_superior'] = 1.25 * meta_poblacional_eval_km['meta_poblacional_provincia']
     meta_poblacional_eval_km
@@ -519,17 +513,7 @@ def _(mo, organizer):
 
 
 @app.cell
-def _(poblacion_total):
-    # 1 diputación por distrito, 59, 80, 150
-    diputados = 59
-    poblacion_meta = poblacion_total / diputados
-    K = round(diputados/7) # como definir diputaciones por provincia
-    print(f"Número estimado de distritos (k): {K}")
-    return K, poblacion_meta
-
-
-@app.cell
-def _(Birch, K, geo_district_data, pd, provincias):
+def _(Birch, geo_district_data, k, pd, provincias):
 
     nuevos_distritos = []
 
@@ -545,7 +529,7 @@ def _(Birch, K, geo_district_data, pd, provincias):
             },
         ).values
 
-        birch = Birch(threshold=0.5, branching_factor=50, n_clusters=K, compute_labels=True).fit(coordinates_birch)
+        birch = Birch(threshold=0.5, branching_factor=50, n_clusters=k, compute_labels=True).fit(coordinates_birch)
 
         new_geo_districts_birch = geo_district_birch.copy()
 
@@ -645,13 +629,13 @@ def _(
 
 
 @app.cell
-def _(new_geo_districts_birch, poblacion_meta):
+def _(meta_poblacional, new_geo_districts_birch):
     agrupado_birch = new_geo_districts_birch.groupby(['provincia','distrito_nuevo']).agg(
         poblacion = ('poblacion_total', 'sum'),
         area = ('area_km2', 'sum')
     )
 
-    agrupado_birch['Desviacion_%'] = 100 * (agrupado_birch['poblacion'] - poblacion_meta) / poblacion_meta
+    agrupado_birch['Desviacion_%'] = 100 * (agrupado_birch['poblacion'] - meta_poblacional) / meta_poblacional
     agrupado_birch.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
     agrupado_birch
 
@@ -661,9 +645,9 @@ def _(new_geo_districts_birch, poblacion_meta):
 
 
 @app.cell
-def _(K, agrupado_birch):
+def _(agrupado_birch, k):
     meta_poblacional_eval_birch = agrupado_birch.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
-    meta_poblacional_eval_birch['meta_poblacional_provincia'] = meta_poblacional_eval_birch['poblacion']/K
+    meta_poblacional_eval_birch['meta_poblacional_provincia'] = meta_poblacional_eval_birch['poblacion']/k
     meta_poblacional_eval_birch['limite_inferior'] = 0.75 * meta_poblacional_eval_birch['meta_poblacional_provincia']
     meta_poblacional_eval_birch['limite_superior'] = 1.25 * meta_poblacional_eval_birch['meta_poblacional_provincia']
     meta_poblacional_eval_birch
