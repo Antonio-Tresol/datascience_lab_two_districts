@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.14.9"
+__generated_with = "0.13.15"
 app = marimo.App(width="medium")
 
 
@@ -22,7 +22,9 @@ def _():
     import pyarrow
     import plotly.graph_objects as go
     import numpy as np
-    return go, gpd, mo, np, nx, pd, px
+    from minisom import MiniSom
+    from sklearn.preprocessing import MinMaxScaler
+    return MinMaxScaler, MiniSom, go, gpd, mo, np, nx, pd, px
 
 
 @app.cell
@@ -706,6 +708,127 @@ def _(geo_district_data, mo, organizer):
             title_original_data_with_polsby_popper_birch,
             geo_district_data.drop(columns="geometry"),
         ]
+    )
+    return
+
+
+@app.cell
+def _(mo, organizer):
+    organizer.new(level=2)
+    mo.md(f"""## {organizer.format()}. SOM""")
+    return
+
+
+@app.cell
+def _(K, np):
+    ALPHA = 0.1
+    DECAY_FUNC = 'linear_decay_to_zero'
+    SIGMA0 = 1
+    SIGMA_DECAY_FUNC = 'linear_decay_to_one'
+    NEIGHBORHOOD_FUNC = 'triangle'
+    DISTANCE_FUNC = 'euclidean'
+    TOPOLOGY = 'rectangular'
+    RANDOM_SEED = 123
+    SOM_X_AXIS_NODES  = round(np.sqrt(K))
+    SOM_Y_AXIS_NODES  = round(np.sqrt(K))
+    SOM_N_VARIABLES  = 2
+    N_ITERATIONS = 5000
+    return (
+        ALPHA,
+        DECAY_FUNC,
+        DISTANCE_FUNC,
+        NEIGHBORHOOD_FUNC,
+        N_ITERATIONS,
+        RANDOM_SEED,
+        SIGMA0,
+        SIGMA_DECAY_FUNC,
+        SOM_N_VARIABLES,
+        SOM_X_AXIS_NODES,
+        SOM_Y_AXIS_NODES,
+        TOPOLOGY,
+    )
+
+
+@app.cell
+def _(
+    ALPHA,
+    DECAY_FUNC,
+    DISTANCE_FUNC,
+    MinMaxScaler,
+    MiniSom,
+    NEIGHBORHOOD_FUNC,
+    N_ITERATIONS,
+    RANDOM_SEED,
+    SIGMA0,
+    SIGMA_DECAY_FUNC,
+    SOM_N_VARIABLES,
+    SOM_X_AXIS_NODES,
+    SOM_Y_AXIS_NODES,
+    TOPOLOGY,
+    geo_district_data,
+    np,
+    pd,
+    provincias,
+):
+    nuevos_distritos_som = []
+    scaler = MinMaxScaler()
+
+    for provincia_som in provincias:
+        geo_district_som = geo_district_data[geo_district_data["provincia"] == provincia_som]
+
+        # Create 2D coordinate array for SOM training
+        coordinates_som = scaler.fit_transform(pd.DataFrame({
+            "x": geo_district_som.geometry.centroid.x.apply(np.real),
+            "y": geo_district_som.geometry.centroid.y.apply(np.real),
+        }).values)
+
+        # Initialize SOM
+        som = MiniSom(
+            SOM_X_AXIS_NODES,
+            SOM_Y_AXIS_NODES,
+            SOM_N_VARIABLES,
+            sigma=SIGMA0,
+            learning_rate=ALPHA,
+            neighborhood_function=NEIGHBORHOOD_FUNC,
+            activation_distance=DISTANCE_FUNC,
+            topology=TOPOLOGY,
+            sigma_decay_function=SIGMA_DECAY_FUNC,
+            decay_function=DECAY_FUNC,
+            random_seed=RANDOM_SEED,
+        )
+
+        som.random_weights_init(coordinates_som)
+        som.train_random(coordinates_som, N_ITERATIONS, verbose=True)
+
+        # Assign district label based on BMU position
+        new_geo_districts_som = geo_district_som.copy()
+
+        # BMU positions (x,y) → convert to unique label (e.g., index or tuple)
+        som_labels = [som.winner(coord) for coord in coordinates_som]
+        # Optionally flatten the (x, y) tuple to a single cluster ID
+        cluster_ids = [x * SOM_Y_AXIS_NODES + y for x, y in som_labels]
+
+        new_geo_districts_som["distrito_nuevo"] = cluster_ids
+        nuevos_distritos_som.append(new_geo_districts_som)
+
+    # Combine all processed provinces
+    new_geo_districts_som = pd.concat(nuevos_distritos_som)
+    return (new_geo_districts_som,)
+
+
+@app.cell
+def _(new_geo_districts_som):
+    new_geo_districts_som
+    return
+
+
+@app.cell
+def _(make_interactive_map, new_geo_districts_som):
+    make_interactive_map(
+        new_geo_districts_som,
+        "Distritos Creados por SOM",
+        "distrito_nuevo",
+        extra_hover_data={"distrito_nuevo": True},
     )
     return
 
