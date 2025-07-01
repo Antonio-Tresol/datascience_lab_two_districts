@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.15"
+__generated_with = "0.14.8"
 app = marimo.App(width="medium")
 
 
@@ -319,7 +319,7 @@ def _():
     from sklearn.cluster import KMeans
     from sklearn.cluster import Birch
     from sklearn.cluster import OPTICS
-    return Birch, KMeans
+    return Birch, DBSCAN, KMeans
 
 
 @app.cell
@@ -486,6 +486,17 @@ def _(new_geo_districts_km, polsby_popper):
     new_geo_districts_km_polspby_popper = new_geo_districts_km_polspby_popper.dissolve(by=['distrito_nuevo', 'provincia'], aggfunc='sum', as_index=False)
     new_geo_districts_km_polspby_popper["polsby_popper"] = new_geo_districts_km_polspby_popper.geometry.apply(polsby_popper)
     new_geo_districts_km_polspby_popper.columns
+    return (new_geo_districts_km_polspby_popper,)
+
+
+@app.cell
+def _(new_geo_districts_km_polspby_popper, polsby_popper):
+    new_geo_districts_km_polspby_popper["polsby_popper"] = new_geo_districts_km_polspby_popper.geometry.apply(polsby_popper)
+    new_geo_districts_km_polspby_popper[["distrito_nuevo", "polsby_popper"]] = new_geo_districts_km_polspby_popper[
+        ["distrito_nuevo", "polsby_popper"]
+    ].sort_values(by="polsby_popper", ascending=True)
+    new_geo_districts_km_polspby_popper.drop(columns='geometry', inplace=True)
+    new_geo_districts_km_polspby_popper
     return
 
 
@@ -981,6 +992,85 @@ def _(geo_district_data, mo, organizer):
             geo_district_data.drop(columns="geometry"),
         ]
     )
+    return
+
+
+@app.cell
+def _(mo, organizer):
+    organizer.new(level=2)
+    mo.md(f"""## {organizer.format()}. DBSCAN""")
+    return
+
+
+@app.cell
+def _(DBSCAN, geo_district_data, pd, provincias):
+    nuevos_distritos_dbscan = []
+
+    for provincia_dbscan in provincias:
+        geo_district_dbscan = geo_district_data[geo_district_data["provincia"] == provincia_dbscan]
+
+        coordinates_dbscan = pd.DataFrame(
+            data={
+                "x": geo_district_dbscan.geometry.centroid.x,
+                "y": geo_district_dbscan.geometry.centroid.y,
+    #            "poblacion":geo_district_birch.poblacion_total,
+    #            "area":geo_district_birch.area_km2,
+            },
+        ).values
+
+        dbscan = DBSCAN(eps=15000, min_samples=3, metric='euclidean', metric_params=None, algorithm='auto', leaf_size=50, p=None, n_jobs=None).fit(coordinates_dbscan)
+        new_geo_districts_dbscan = geo_district_dbscan.copy()
+        dbscan.labels_
+
+        new_geo_districts_dbscan["distrito_nuevo"] = dbscan.labels_
+
+        nuevos_distritos_dbscan.append(new_geo_districts_dbscan)
+
+    new_geo_districts_dbscan = pd.concat([nuevos_distritos_dbscan[0], nuevos_distritos_dbscan[1],nuevos_distritos_dbscan[2], nuevos_distritos_dbscan[3], nuevos_distritos_dbscan[4], nuevos_distritos_dbscan[5],nuevos_distritos_dbscan[6]])
+    return (new_geo_districts_dbscan,)
+
+
+@app.cell
+def _(make_interactive_map, new_geo_districts_dbscan):
+    make_interactive_map(
+        new_geo_districts_dbscan,
+        "Distritos Creados por DBSCAN",
+        "distrito_nuevo",
+        extra_hover_data={"distrito_nuevo": True},
+    )
+    return
+
+
+@app.cell
+def _(new_geo_districts_birch, new_geo_districts_dbscan, selected_province):
+    selected_province_new_geo_districts_dbscan = new_geo_districts_birch[new_geo_districts_dbscan["provincia"] == selected_province]
+    selected_province_new_geo_districts_dbscan
+    return
+
+
+@app.cell
+def _(mo, organizer):
+    organizer.new(level=2)
+    mo.md(f"""## {organizer.format()}. Comparaciones""")
+    return
+
+
+@app.cell
+def _(
+    new_geo_districts_birch_polspby_popper,
+    new_geo_districts_km_polspby_popper,
+    new_geo_districts_som_polspby_popper,
+):
+    new_geo_districts_som_polspby_popper_provincia = new_geo_districts_som_polspby_popper.groupby(['provincia']).agg(polsby_popper_som = ('polsby_popper', 'mean'))
+
+    new_geo_districts_birch_polspby_popper_provincia = new_geo_districts_birch_polspby_popper.groupby(['provincia']).agg(polsby_popper_birch = ('polsby_popper', 'mean'))
+
+    comparacion_polsby_popper = new_geo_districts_birch_polspby_popper_provincia.merge(new_geo_districts_som_polspby_popper_provincia, on='provincia')
+
+    new_geo_districts_km_polspby_popper_provincia = new_geo_districts_km_polspby_popper.groupby(['provincia']).agg(polsby_popper_km = ('polsby_popper', 'mean'))
+
+    comparacion_polsby_popper = comparacion_polsby_popper.merge(new_geo_districts_km_polspby_popper_provincia, on='provincia')
+    comparacion_polsby_popper
     return
 
 
