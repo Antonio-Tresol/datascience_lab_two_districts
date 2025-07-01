@@ -374,12 +374,139 @@ def _(KMeans, geo_district_data, k, nuevos_distritos, pd, provincias):
 
 @app.cell
 def _(make_interactive_map, new_geo_districts_km):
-    # TODO: hacer gráfico interactivo
     make_interactive_map(
         new_geo_districts_km,
         "Distritos Creados por KMeans",
         "distrito_nuevo",
         extra_hover_data={"distrito_nuevo": True},
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    column_color_dropdown_km = mo.ui.dropdown(
+        options={
+            "Población total": "poblacion_total",
+            "Área (km²)": "area_km2",
+            "Cantón": "canton",
+            "Distrito nuevo": "distrito_nuevo"
+        },
+        value="Distrito nuevo",
+        label="Variable para color"
+    )
+    return (column_color_dropdown_km,)
+
+
+@app.cell
+def _(column_color_dropdown_km):
+    selected_column_color_km = column_color_dropdown_km.value
+    selected_column_color_key_km = column_color_dropdown_km.selected_key
+    return selected_column_color_key_km, selected_column_color_km
+
+
+@app.cell
+def _(selected_column_color_km, unique_colors):
+    plot_colors_km = None
+    if selected_column_color_km != "poblacion_total" or selected_column_color_km != "area_km2":
+        plot_colors_km = unique_colors
+    return
+
+
+@app.cell
+def _(
+    column_color_dropdown_km,
+    make_interactive_map,
+    mo,
+    new_geo_districts_km,
+    plot_colors,
+    province_dropdown,
+    selected_column_color_key,
+    selected_column_color_key_km,
+    selected_column_color_km,
+    selected_province,
+    selected_province_key,
+):
+    selected_province_new_geo_districts_km = new_geo_districts_km[new_geo_districts_km["provincia"] == selected_province]
+
+    interactive_map_km = mo.ui.plotly(make_interactive_map(
+        geo_df=selected_province_new_geo_districts_km,
+        title=f"Distritos de {selected_province_key} mostrados por {selected_column_color_key} creado con KMeans",
+        color_col=selected_column_color_km,
+        legend_title=selected_column_color_key_km,
+        return_figure=True,
+        color_sequence=plot_colors
+    ))
+
+    mo.vstack([
+        province_dropdown,
+        column_color_dropdown_km,
+        interactive_map_km
+    ])
+    return
+
+
+@app.cell
+def _(new_geo_districts_km, poblacion_meta):
+    agrupado_km = new_geo_districts_km.groupby(['provincia','distrito_nuevo']).agg(
+        poblacion = ('poblacion_total', 'sum'),
+        area = ('area_km2', 'sum')
+    )
+
+    agrupado_km['Desviacion_%'] = 100 * (agrupado_km['poblacion'] - poblacion_meta) / poblacion_meta
+    agrupado_km.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
+    agrupado_km
+    return (agrupado_km,)
+
+
+@app.cell
+def _(K, agrupado_km):
+    meta_poblacional_eval_km = agrupado_km.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
+    meta_poblacional_eval_km['meta_poblacional_provincia'] = meta_poblacional_eval_km['poblacion']/K
+    meta_poblacional_eval_km['limite_inferior'] = 0.75 * meta_poblacional_eval_km['meta_poblacional_provincia']
+    meta_poblacional_eval_km['limite_superior'] = 1.25 * meta_poblacional_eval_km['meta_poblacional_provincia']
+    meta_poblacional_eval_km
+    return (meta_poblacional_eval_km,)
+
+
+@app.cell
+def _(agrupado_km, meta_poblacional_eval_km):
+    agrupado_vals_km = agrupado_km.merge(meta_poblacional_eval_km, on='provincia')
+    agrupado_vals_km
+    return (agrupado_vals_km,)
+
+
+@app.cell
+def _(agrupado_vals_km):
+    agrupado_vals_km['Valido'] = agrupado_vals_km['poblacion_x'].between(agrupado_vals_km['limite_inferior'], agrupado_vals_km['limite_superior'])
+
+    agrupado_vals_km
+    return
+
+
+@app.cell
+def _(new_geo_districts_km, polsby_popper):
+    new_geo_districts_km_polspby_popper = new_geo_districts_km.drop(columns = ['codigo', 'distrito', 'canton', 'polsby_popper'])
+    new_geo_districts_km_polspby_popper = new_geo_districts_km_polspby_popper.dissolve(by=['distrito_nuevo', 'provincia'], aggfunc='sum', as_index=False)
+    new_geo_districts_km_polspby_popper["polsby_popper"] = new_geo_districts_km_polspby_popper.geometry.apply(polsby_popper)
+    new_geo_districts_km_polspby_popper.columns
+    return
+
+
+@app.cell
+def _(geo_district_data, mo, organizer):
+    """Calculate district metrics like Polsby-Popper compactness"""
+
+    organizer.new(level=3)
+    title_original_data_with_polsby_popper_km = mo.md(
+        text=f"### {organizer.format()}. Distritos originales con polsby popper (sin la columna de geometría) con KMeans"
+    )
+
+    mo.vstack(
+        items=[
+            title_original_data_with_polsby_popper_km,
+            geo_district_data.drop(columns="geometry"),
+        ]
     )
     return
 
@@ -519,51 +646,44 @@ def _(
 
 @app.cell
 def _(new_geo_districts_birch, poblacion_meta):
-
-    agrupado = new_geo_districts_birch.groupby(['provincia','distrito_nuevo']).agg(
+    agrupado_birch = new_geo_districts_birch.groupby(['provincia','distrito_nuevo']).agg(
         poblacion = ('poblacion_total', 'sum'),
         area = ('area_km2', 'sum')
     )
 
-    agrupado['Desviacion_%'] = 100 * (agrupado['poblacion'] - poblacion_meta) / poblacion_meta
-    agrupado
+    agrupado_birch['Desviacion_%'] = 100 * (agrupado_birch['poblacion'] - poblacion_meta) / poblacion_meta
+    agrupado_birch.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
+    agrupado_birch
 
     #agrupado_al['Desviacion_%'] = 100 * (agrupado_al['Poblacion'] - meta_poblacional) / meta_poblacional
     #agrupado_al.sort_values(by='Poblacion')
-    return (agrupado,)
+    return (agrupado_birch,)
 
 
 @app.cell
-def _(K, agrupado, meta_poblacional_eval):
-    agrupado.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
-    meta_poblacional_eval['meta_poblacional_provincia'] = meta_poblacional_eval['poblacion']/K
-    return
+def _(K, agrupado_birch):
+    meta_poblacional_eval_birch = agrupado_birch.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
+    meta_poblacional_eval_birch['meta_poblacional_provincia'] = meta_poblacional_eval_birch['poblacion']/K
+    meta_poblacional_eval_birch['limite_inferior'] = 0.75 * meta_poblacional_eval_birch['meta_poblacional_provincia']
+    meta_poblacional_eval_birch['limite_superior'] = 1.25 * meta_poblacional_eval_birch['meta_poblacional_provincia']
+    meta_poblacional_eval_birch
+    return (meta_poblacional_eval_birch,)
 
 
 @app.cell
-def _(K, agrupado):
-    meta_poblacional_eval = agrupado.groupby(['provincia']).agg(poblacion = ('poblacion', 'sum'))
-    meta_poblacional_eval['meta_poblacional_provincia'] = meta_poblacional_eval['poblacion']/K
-    meta_poblacional_eval['limite_inferior'] = 0.75 * meta_poblacional_eval['meta_poblacional_provincia']
-    meta_poblacional_eval['limite_superior'] = 1.25 * meta_poblacional_eval['meta_poblacional_provincia']
-    meta_poblacional_eval
-    return (meta_poblacional_eval,)
+def _(agrupado_birch, meta_poblacional_eval_birch):
+    agrupado_vals_birch = agrupado_birch.merge(meta_poblacional_eval_birch, on='provincia')
+    agrupado_vals_birch
+    return (agrupado_vals_birch,)
 
 
 @app.cell
-def _(agrupado, meta_poblacional_eval):
-    agrupado_vals = agrupado.merge(meta_poblacional_eval, on='provincia')
-    agrupado_vals
-    return (agrupado_vals,)
-
-
-@app.cell
-def _(agrupado_vals):
+def _(agrupado_vals_birch):
 
     # Agregar columnas de validación
-    agrupado_vals['Valido'] = agrupado_vals['poblacion_x'].between(agrupado_vals['limite_inferior'], agrupado_vals['limite_superior'])
+    agrupado_vals_birch['Valido'] = agrupado_vals_birch['poblacion_x'].between(agrupado_vals_birch['limite_inferior'], agrupado_vals_birch['limite_superior'])
 
-    agrupado_vals
+    agrupado_vals_birch
 
     return
 
@@ -592,11 +712,9 @@ def _(new_geo_districts_birch_polspby_popper, polsby_popper):
 def _(geo_district_data, mo, organizer):
     """Calculate district metrics like Polsby-Popper compactness"""
 
-
-
     organizer.new(level=3)
     title_original_data_with_polsby_popper_birch = mo.md(
-        text=f"### {organizer.format()}. Distritos originales con polsby popper (sin la columna de geometría)"
+        text=f"### {organizer.format()}. Distritos originales con polsby popper (sin la columna de geometría) con Birch"
     )
 
     mo.vstack(
