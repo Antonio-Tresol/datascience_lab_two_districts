@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.14.8"
+__generated_with = "0.14.9"
 app = marimo.App(width="medium")
 
 
@@ -146,7 +146,7 @@ def make_neighbor_graph(build_continuity_graph, geo_district_data, nx):
 @app.cell
 def _(G, nx):
     componentes = list(nx.connected_components(G))
-    print(f"Número de componentes conexas: {len(componentes)}")
+    print(f"Número de componentes conexos: {len(componentes)}")
     if len(componentes) == 1:
         print("Todos los distritos están contiguamente conectados.")
     else:
@@ -304,6 +304,7 @@ def _(mo, organizer):
     - hacer el analisis con 57, con 84, con 160 diputados (esto influye en la poblacion meta. recordar poblacion meta es poblacion_cr/num_diputados)
     - region growing
     """)
+
     return
 
 
@@ -320,6 +321,19 @@ def _():
 
 
 @app.cell
+def variables_for_modeling():
+    provincias = ["SAN JOSE","ALAJUELA","CARTAGO","HEREDIA","GUANACASTE","PUNTARENAS","LIMON"]
+    return (provincias,)
+
+
+@app.cell
+def _(mo, organizer):
+    organizer.new(level=2)
+    mo.md(f"""## {organizer.format()}. Kmeans""")
+    return
+
+
+@app.cell
 def _(geo_district_data):
     # Nuevo valor de k
     poblacion_total = geo_district_data["poblacion_total"].sum()
@@ -327,27 +341,42 @@ def _(geo_district_data):
     # es la misma para todas las provincias
     cantidad_diputados = poblacion_total / meta_poblacional
 
-    k = round(poblacion_total / meta_poblacional)
+    k = round(poblacion_total / meta_poblacional / 7)
     print(f"Número estimado de distritos (k): {k}")
     return k, poblacion_total
 
 
 @app.cell
-def _(KMeans, geo_district_data, k, make_interactive_map, pd):
-    coordinates = pd.DataFrame(
-        data={
-            "x": geo_district_data.geometry.centroid.x,
-            "y": geo_district_data.geometry.centroid.y,
-        },
-    ).values
+def _(KMeans, geo_district_data, k, nuevos_distritos, pd, provincias):
+    nuevos_distritos_km = []
 
-    kmeans = KMeans(n_clusters=k, random_state=0, n_init=10).fit(coordinates)
-    new_geo_districts = geo_district_data.copy()
+    for prov in provincias:
+        geo_district_km = geo_district_data[geo_district_data["provincia"] == prov]
 
-    new_geo_districts["distrito_nuevo"] = kmeans.labels_
+        coordinates_kmeans = pd.DataFrame(
+            data={
+                "x": geo_district_km.geometry.centroid.x,
+                "y": geo_district_km.geometry.centroid.y,
+            },
+        ).values
+
+        kmeans = KMeans(n_clusters=k, random_state=0, n_init=10).fit(coordinates_kmeans)
+
+        new_geo_districts_km = geo_district_km.copy()
+
+        new_geo_districts_km["distrito_nuevo"] = kmeans.labels_
+
+        nuevos_distritos_km.append(new_geo_districts_km)
+
+    new_geo_districts_km = pd.concat([nuevos_distritos[0], nuevos_distritos[1],nuevos_distritos[2], nuevos_distritos[3], nuevos_distritos[4], nuevos_distritos[5],nuevos_distritos[6]])
+    return (new_geo_districts_km,)
+
+
+@app.cell
+def _(make_interactive_map, new_geo_districts_km):
     # TODO: hacer gráfico interactivo
     make_interactive_map(
-        new_geo_districts,
+        new_geo_districts_km,
         "Distritos Creados por KMeans",
         "distrito_nuevo",
         extra_hover_data={"distrito_nuevo": True},
@@ -368,8 +397,8 @@ def _(poblacion_total):
     diputados = 59
     poblacion_meta = poblacion_total / diputados
     K = round(diputados/7) # como definir diputaciones por provincia
-    provincias = ["SAN JOSE","ALAJUELA","CARTAGO","HEREDIA","GUANACASTE","PUNTARENAS","LIMON"]
-    return K, poblacion_meta, provincias
+    print(f"Número estimado de distritos (k): {K}")
+    return K, poblacion_meta
 
 
 @app.cell
@@ -399,7 +428,7 @@ def _(Birch, K, geo_district_data, pd, provincias):
 
     new_geo_districts_birch = pd.concat([nuevos_distritos[0], nuevos_distritos[1],nuevos_distritos[2], nuevos_distritos[3], nuevos_distritos[4], nuevos_distritos[5],nuevos_distritos[6]])
 
-    return (new_geo_districts_birch,)
+    return new_geo_districts_birch, nuevos_distritos
 
 
 @app.cell
@@ -473,7 +502,7 @@ def _(
 
     interactive_map_birch = mo.ui.plotly(make_interactive_map(
         geo_df=selected_province_new_geo_districts_birch,
-        title=f"Distritos de {selected_province_key} mostrados por {selected_column_color_key}",
+        title=f"Distritos de {selected_province_key} mostrados por {selected_column_color_key} creado con Birch",
         color_col=selected_column_color_birch,
         legend_title=selected_column_color_key_birch,
         return_figure=True,
